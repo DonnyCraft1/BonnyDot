@@ -4,5 +4,3 @@ const config = require('./config.json');
 require('./util/eventLoader')(client);
 
 client.login(config.token);
-
-//This is new!
