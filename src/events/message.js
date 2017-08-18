@@ -54,9 +54,8 @@ module.exports = message => {
 	});
 
 	//If author does not have all required perms, return MISSING PERMS!
-	console.log(missingPerms);
 	if (missingPerms.length > 0) {
-		message.channel.send('__**Missing permissions!**__\n\n* ' + missingPerms.join('\n* '));
+		message.channel.send('__**Missing permissions!**__\n\n:poop: ' + missingPerms.join('\n:poop: '));
 		return;
 	}
 	//HAVE THE RIGHT PERMS
