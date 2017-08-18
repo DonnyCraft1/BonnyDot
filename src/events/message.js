@@ -51,7 +51,13 @@ module.exports = message => {
 
 	//Check if the guild is blocked
 	if (cmdFile.data.blocked.guilds[message.guild.id]) {
-		message.channel.send('Sorry, this guild is blocked!\n\nReason: *' + cmdFile.data.blocked.guilds[message.guild.id] + '*')
+		message.channel.send('Sorry, this guild is blocked from this command!\n\nReason: __*' + cmdFile.data.blocked.guilds[message.guild.id] + '*__')
+		return;
+	}
+
+	//Check if the user is blocked
+	if (cmdFile.data.blocked.users[message.author.id]) {
+		message.channel.send('Sorry, your are blocked from this command!\n\nReason: __*' + cmdFile.data.blocked.users[message.author.id] + '*__')
 		return;
 	}
 

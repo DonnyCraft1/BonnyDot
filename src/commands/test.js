@@ -20,6 +20,6 @@ exports.data = {
     //Key Value
     //Id  Reason
     guilds: {},
-    users: {}
+    users: {'162948860782575617': 'Some special reason!'}
   }
 }
