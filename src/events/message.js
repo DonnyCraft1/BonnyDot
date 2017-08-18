@@ -32,7 +32,10 @@ module.exports = message => {
 	});
 		if (!allCommands.has(command)) return(message.channel.send('Sorry, that command does not exist!'));
 		//THE COMMAND EXIST!
-	let cmdFile = require(`../commands/${allCommands.get(command)}`)
+	let cmdFile = require(`../commands/${allCommands.get(command)}`);
+	if (cmdFile.data.onlyDev) {
+		if (message.author.id !== config.devId) return(message.channel.send('This command is limited to the owner of this bot!'));
+	}
 	let missingPerms = [];
 	cmdFile.data.permFlags.channel.forEach((item, index) => {
 		if (!message.channel.permissionsFor(message.author).has(item)) missingPerms.push(cmdFile.data.permFlags.channel[index]);
@@ -45,6 +48,7 @@ module.exports = message => {
 		message.channel.send('__**Missing permissions!**__\n\n* ' + missingPerms.join('\n* '));
 		return;
 	}
+	//HAVE THE RIGHT PERMS
 	cmdFile.run({
 		message: message,
 		args: args,
