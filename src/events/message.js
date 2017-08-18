@@ -16,8 +16,8 @@ module.exports = message => {
 
 	if (!command) return;
 	let commandsList = fs.readdirSync('./commands/');
-	commandsList.forEach((item, index) => {
-		if (!item.match(/\.js$/)) commandsList.splice(index, 1);
+	commandsList.forEach((file, index) => {
+		if (!file.match(/\.js$/)) commandsList.splice(index, 1);
 	});
 	let allCommands = new Map();
 
@@ -25,10 +25,10 @@ module.exports = message => {
 		return value.replace(/\.js$/, '');
 	};
 
-	commandsList.forEach((item, index) => {
-		allCommands.set(removeJS(item), removeJS(item));
-		let aliases = require(`../commands/${item}`).data.aliases;
-		aliases.forEach((item2, index2) => allCommands.set(removeJS(item2), removeJS(item)));
+	commandsList.forEach((cmdName, index) => {
+		allCommands.set(removeJS(cmdName), removeJS(cmdName));
+		let aliases = require(`../commands/${cmdName}`).data.aliases;
+		aliases.forEach((alias, index2) => allCommands.set(removeJS(alias), removeJS(cmdName)));
 	});
 		if (!allCommands.has(command)) return(message.channel.send('Sorry, that command does not exist!'));
 		//THE COMMAND EXIST!
@@ -46,11 +46,11 @@ module.exports = message => {
 	let missingPerms = [];
 
 	let channelPermsFor = message.channel.permissionsFor(message.author);
-	cmdFile.data.permFlags.channel.forEach((item, index) => {
-		if (!channelPermsFor.has(item)) missingPerms.push(cmdFile.data.permFlags.channel[index]);
+	cmdFile.data.permFlags.channel.forEach((perm, index) => {
+		if (!channelPermsFor.has(perm)) missingPerms.push(cmdFile.data.permFlags.channel[index]);
 	});
-	cmdFile.data.permFlags.guild.forEach((item, index) => {
-		if (!message.member.hasPermission(item)) missingPerms.push(cmdFile.data.permFlags.guild[index]);
+	cmdFile.data.permFlags.guild.forEach((perm, index) => {
+		if (!message.member.hasPermission(perm)) missingPerms.push(cmdFile.data.permFlags.guild[index]);
 	});
 
 	//If author does not have all required perms, return MISSING PERMS!
