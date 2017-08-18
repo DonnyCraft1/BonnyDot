@@ -19,7 +19,7 @@ exports.data = {
   blocked: {
     //Key Value
     //Id  Reason
-    guilds: {'302008518486130688': 'Some reason!'},
-    users: []
+    guilds: {},
+    users: {}
   }
 }

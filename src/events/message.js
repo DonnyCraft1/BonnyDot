@@ -103,7 +103,7 @@ module.exports = message => {
 	}
 
 
-	//CALL THE COMMAND
+	//Call the command
 	cmdFile.run({
 		message: message,
 		args: args,
