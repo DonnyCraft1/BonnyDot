@@ -6,7 +6,7 @@ exports.data = {
     channel: [],
     guild: []
   },
-  denyBots: true,
+  denyBots: false,
   onlyDev: false,
   disabled: {
     isDisabled: false,
@@ -20,6 +20,6 @@ exports.data = {
     //Key Value
     //Id  Reason
     guilds: {},
-    users: {'162948860782575617': 'Some special reason!'}
+    users: {}
   }
 }

@@ -49,15 +49,27 @@ module.exports = message => {
 		if (message.author.id !== config.devId) return(message.channel.send('This command is limited to the owner of this bot!'));
 	}
 
-	//Check if the guild is blocked
+	//Check if the guild is blocked for this command
 	if (cmdFile.data.blocked.guilds[message.guild.id]) {
 		message.channel.send('Sorry, this guild is blocked from this command!\n\nReason: __*' + cmdFile.data.blocked.guilds[message.guild.id] + '*__')
 		return;
 	}
 
-	//Check if the user is blocked
+	//Check if the user is blocked for this command
 	if (cmdFile.data.blocked.users[message.author.id]) {
 		message.channel.send('Sorry, your are blocked from this command!\n\nReason: __*' + cmdFile.data.blocked.users[message.author.id] + '*__')
+		return;
+	}
+
+	//Check if the guild is blocked for the whole bot
+	if (config.blocked.guilds[message.guild.id]) {
+		message.channel.send('Sorry, this guild is blocked from the whole bot!\n\nReason: __*' + config.blocked.guilds[message.guild.id] + '*__')
+		return;
+	}
+
+	//Check if the user is blocked for the whole bot
+	if (config.blocked.users[message.author.id]) {
+		message.channel.send('Sorry, your are blocked from the whole bot!\n\nReason: __*' + config.blocked.users[message.author.id] + '*__')
 		return;
 	}
 
@@ -82,7 +94,7 @@ module.exports = message => {
 	//Check timeout!
 	if (!timeouts[cmdFileName]) timeouts[cmdFileName] = [];
 	if (timeouts[cmdFileName].includes(message.author.id)) {
-		message.channel.send('Please wait! This command has a cooldown of `' + cmdFile.data.timeout + 'ms`');
+		message.channel.send('Please wait! This command has a cooldown of `' + cmdFile.data.timeout / 1000 + 's`');
 		return;
 	}
 
@@ -100,7 +112,6 @@ module.exports = message => {
 	let syntax = {};
 	syntax.required = cmdFile.data.syntax.match(/<[^>]*>/g);
 	syntax.optional = cmdFile.data.syntax.match(/\[[^\]]*]/g);
-	console.log(syntax);
 
 	//Return if not enough args is specifyed!
 	if (args.length < syntax.required.length) {
