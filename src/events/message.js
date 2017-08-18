@@ -35,7 +35,10 @@ module.exports = message => {
 	let cmdFile = require(`../commands/${allCommands.get(command)}`);
 
 	//Deny bots
-	if (cmdFile.data.denyBots) return(message.channel.send('This command doesnt allow bots!'));
+	console.log(cmdFile.data.denyBots);
+	if (cmdFile.data.denyBots) {
+		if (message.author.bot) return(message.channel.send('This command doesnt allow bots!'));
+	}
 
 	//Check if the command is disabled
 	if (cmdFile.data.disabled.isDisabled) return(message.channel.send('Sorry, this command is disabled!\n__*' + cmdFile.data.disabled.reason + '*__'));
