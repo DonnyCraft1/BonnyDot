@@ -35,7 +35,7 @@ module.exports = message => {
 	let cmdFile = require(`../commands/${allCommands.get(command)}`);
 
 	//Check if the command is disabled
-	if (cmdFile.data.disabled) return(message.channel.send('Sorry, this command is disabled!'));
+	if (cmdFile.data.disabled.isDisabled) return(message.channel.send('Sorry, this command is disabled!\n*' + cmdFile.data.disabled.reason + '*'));
 
 	//Check if the command is only dev
 	if (cmdFile.data.onlyDev) {
