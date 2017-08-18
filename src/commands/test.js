@@ -7,6 +7,7 @@ exports.data = {
     guild: []
   },
   onlyDev: false,
+  disabled: false,
   help: 'This command is here to blah blah blah.',
   syntax: '<required1> <required2> [optional]',
   aliases: ['testing']
