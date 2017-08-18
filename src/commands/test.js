@@ -14,5 +14,12 @@ exports.data = {
   },
   help: 'This command is here to blah blah blah.',
   syntax: '<required1> <required2> [optional]',
-  aliases: ['testing']
+  timeout: 0,
+  aliases: ['testing'],
+  blocked: {
+    //Key Value
+    //Id  Reason
+    guilds: {'302008518486130688': 'Some reason!'},
+    users: []
+  }
 }

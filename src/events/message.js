@@ -1,6 +1,7 @@
 const chalk = require('chalk');
 const config = require('../config.json');
 const fs = require('fs');
+let timeouts = {};
 module.exports = message => {
 
 
@@ -32,10 +33,10 @@ module.exports = message => {
 	});
 		if (!allCommands.has(command)) return(message.channel.send('Sorry, that command does not exist!'));
 		//THE COMMAND EXIST!
-	let cmdFile = require(`../commands/${allCommands.get(command)}`);
+		let cmdFileName = allCommands.get(command);
+		let cmdFile = require(`../commands/${cmdFileName}`);
 
 	//Deny bots
-	console.log(cmdFile.data.denyBots);
 	if (cmdFile.data.denyBots) {
 		if (message.author.bot) return(message.channel.send('This command doesnt allow bots!'));
 	}
@@ -46,6 +47,12 @@ module.exports = message => {
 	//Check if the command is only dev
 	if (cmdFile.data.onlyDev) {
 		if (message.author.id !== config.devId) return(message.channel.send('This command is limited to the owner of this bot!'));
+	}
+
+	//Check if the guild is blocked
+	if (cmdFile.data.blocked.guilds[message.guild.id]) {
+		message.channel.send('Sorry, this guild is blocked!\n\nReason: *' + cmdFile.data.blocked.guilds[message.guild.id] + '*')
+		return;
 	}
 
 	//Check if author has all required perms
@@ -65,6 +72,35 @@ module.exports = message => {
 		return;
 	}
 	//HAVE THE RIGHT PERMS
+
+	//Check timeout!
+	if (!timeouts[cmdFileName]) timeouts[cmdFileName] = [];
+	if (timeouts[cmdFileName].includes(message.author.id)) {
+		message.channel.send('Please wait! This command has a cooldown of `' + cmdFile.data.timeout + 'ms`');
+		return;
+	}
+
+	//If the command has a timeout
+	if (cmdFile.data.timeout > 0) {
+		timeouts[cmdFileName].push(message.author.id);
+		setTimeout(() => {
+			timeouts[cmdFileName].splice(timeouts[cmdFileName].indexOf(message.author.id), 1);
+		}, cmdFile.data.timeout)
+	}
+
+
+
+	//Check syntax
+	let syntax = {};
+	syntax.required = cmdFile.data.syntax.match(/<[^>]*>/g);
+	syntax.optional = cmdFile.data.syntax.match(/\[[^\]]*]/g);
+	console.log(syntax);
+
+	//Return if not enough args is specifyed!
+	if (args.length < syntax.required.length) {
+		message.channel.send('Not enough args spesifyed!\n\n__Syntax:__ `' + config.prefix + command + ' ' + cmdFile.data.syntax + '`');
+		return;
+	}
 
 
 	//CALL THE COMMAND
