@@ -6,6 +6,7 @@ exports.data = {
     channel: [],
     guild: []
   },
+  denyBots: true,
   onlyDev: false,
   disabled: {
     isDisabled: false,
