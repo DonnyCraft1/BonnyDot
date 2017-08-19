@@ -7,12 +7,12 @@ exports.data = {
     guild: []
   },
   denyBots: true,
-  onlyDev: true,
+  onlyDev: false,
   disabled: {
-    isDisabled: true,
-    reason: 'This is only a blueprint for new commands'
+    isDisabled: false,
+    reason: ''
   },
-  desc: 'SomeDesc',
+  desc: '',
   syntax: '',
   timeout: 0,
   aliases: [],
