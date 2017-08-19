@@ -29,7 +29,7 @@ exports.run = (inp) => {
   let AllPermsRequired = cmdFile.data.permFlags.guild.concat(cmdFile.data.permFlags.channel).join(', ');
 
   embed.setColor('#e5228a');
-  embed.addField('Description', cmdFile.data.desc, false);
+  embed.addField('Description', (cmdFile.data.desc) ? cmdFile.data.desc : '*No description provided*', false);
   embed.addField('Permissions required', (AllPermsRequired) ? AllPermsRequired : '*none*', false);
   embed.addField('Bots denied', cmdFile.data.denyBots, false);
   embed.addField('Only developer', cmdFile.data.onlyDev, false);
