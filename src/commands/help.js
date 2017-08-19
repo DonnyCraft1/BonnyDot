@@ -2,6 +2,27 @@ const fs = require('fs');
 const Discord = require('discord.js');
 const config = require('../config.json');
 exports.run = (inp) => {
+  if (!inp.args[0]) {
+    let catFile = require('../categories.json');
+    let catArr = catFile.map(i => i.name);
+    let commandsList = fs.readdirSync('./commands/');
+  	commandsList.forEach((file, index) => {
+  		if (!file.match(/\.js$/)) commandsList.splice(index, 1);
+  	});
+    let commandsStringList = '';
+    catArr.forEach((cat) => {
+      commandsStringList += '\n\n**' + cat + '**';
+      commandsList.forEach((cmd) => {
+        if (require('../commands/' + cmd).data.category === cat) commandsStringList += '\n- ' + cmd;
+      })
+    })
+    let embed = new Discord.RichEmbed();
+    embed.addField('Info', 'Do `' + config.prefix + 'help <Command>` for more spesific information!', false);
+    embed.addField('Commands', commandsStringList, false)
+    inp.message.channel.send({embed});
+
+  } else {
+
   let command = inp.args[0];
 
   let commandsList = fs.readdirSync('./commands/');
@@ -31,7 +52,7 @@ exports.run = (inp) => {
   embed.setColor('#e5228a');
   embed.addField('Description', (cmdFile.data.desc) ? cmdFile.data.desc : '*No description provided*', false);
   embed.addField('Permissions required', (AllPermsRequired) ? AllPermsRequired : '*none*', false);
-  embed.addField('Bots denied', cmdFile.data.denyBots, false);
+  embed.addField('Bots denied', (config.denyBots) ? 'true' : cmdFile.data.denyBots, false);
   embed.addField('Only developer', cmdFile.data.onlyDev, false);
   embed.addField('Command disabled', (cmdFile.data.disabled.isDisabled) ? 'true: ' + cmdFile.data.disabled.reason : 'false');
   embed.addField('Syntax', config.prefix + command + ' ' + cmdFile.data.syntax, false);
@@ -40,6 +61,7 @@ exports.run = (inp) => {
   embed.setThumbnail(inp.message.author.avatarURL);
 
   inp.message.channel.send({embed});
+}
 }
 exports.data = {
   permFlags: {
@@ -53,11 +75,12 @@ exports.data = {
     reason: ''
   },
   desc: 'Get information and help for a command',
-  syntax: '<command name>',
+  syntax: '[command name | category name]',
   timeout: 0,
-  aliases: ['info'],
+  aliases: ['info', 'commands', 'cmds'],
   blocked: {
     guilds: {},
     users: {}
-  }
+  },
+  category: 'Util'
 }

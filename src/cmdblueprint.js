@@ -21,5 +21,6 @@ exports.data = {
     //Id  Reason
     guilds: {},
     users: {}
-  }
+  },
+  category: ''
 }

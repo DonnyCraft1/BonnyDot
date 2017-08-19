@@ -5,5 +5,5 @@ module.exports = client => {
 	console.log(chalk.bgGreen.black('I\'m Online'));
 	client.user.setStatus('idle');
 	setInterval(() => {
-  client.user.setGame(games[Math.floor(Math.random()*games.length)]);
+  	client.user.setGame(games[Math.floor(Math.random()*games.length)]);
 },60000)}

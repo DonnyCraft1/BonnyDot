@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Developer",
+    "Desc": "SomeDesc"
+  },
+  {
+    "name": "Util",
+    "Desc": "SomeDesc"
+  },
+  {
+    "name": "Fun",
+    "Desc": "SomeDesc"
+  },
+  {
+    "name": "Moderation",
+    "Desc": "SomeDesc"
+  },
+  {
+    "name": "Customisation",
+    "Desc": "SomeDesc"
+  }
+]
