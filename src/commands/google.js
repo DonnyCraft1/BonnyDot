@@ -20,7 +20,7 @@ exports.data = {
   aliases: ['howtogoogle', 'search'],
   blocked: {
     guilds: {},
-    users: {},
-    category: 'Fun'
-  }
+    users: {}
+  },
+  category: 'Fun'
 }

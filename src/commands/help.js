@@ -1,3 +1,4 @@
+//REMEMBER TO ADD CURRENT BOT STATS TO THIS COMMAND!
 const fs = require('fs');
 const Discord = require('discord.js');
 const config = require('../config.json');
@@ -9,6 +10,8 @@ exports.run = (inp) => {
   	commandsList.forEach((file, index) => {
   		if (!file.match(/\.js$/)) commandsList.splice(index, 1);
   	});
+    console.log('catArr: ' + catArr);
+    console.log('commandsList: ' + commandsList);
     let commandsStringList = '';
     catArr.forEach((cat) => {
       commandsStringList += '\n\n**' + cat + '**';
@@ -16,6 +19,12 @@ exports.run = (inp) => {
         if (require('../commands/' + cmd).data.category === cat) commandsStringList += '\n- ' + cmd;
       })
     })
+
+    commandsStringList += '\n\n**Descriptionless commands**';
+    commandsList.forEach((cmd) => {
+      if (require('../commands/' + cmd).data.category === '') commandsStringList += '\n- ' + cmd;
+    })
+
     let embed = new Discord.RichEmbed();
     embed.addField('Info', 'Do `' + config.prefix + 'help <Command>` for more spesific information!', false);
     embed.addField('Commands', commandsStringList, false)

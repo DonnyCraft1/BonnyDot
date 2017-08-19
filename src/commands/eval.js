@@ -35,7 +35,7 @@ exports.data = {
     //Key Value
     //Id  Reason
     guilds: {},
-    users: {},
-    category: 'Developer'
-  }
+    users: {}
+  },
+  category: 'Developer'
 }
