@@ -43,8 +43,8 @@ exports.run = (inp) => {
 }
 exports.data = {
   permFlags: {
-    channel: ['MANAGE_MESSAGES'],
-    guild: ['ADMINISTRATOR']
+    channel: [],
+    guild: []
   },
   denyBots: true,
   onlyDev: false,
