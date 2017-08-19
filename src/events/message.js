@@ -2,7 +2,7 @@ const chalk = require('chalk');
 const config = require('../config.json');
 const fs = require('fs');
 let timeouts = {};
-module.exports = message => {
+module.exports = (client, message) => {
 
 
 	if (!message.content.startsWith(config.prefix)) return;
@@ -34,7 +34,12 @@ module.exports = message => {
 		let cmdFileName = allCommands.get(command);
 		let cmdFile = require(`../commands/${cmdFileName}`);
 
-	//Deny bots
+		//Deny bots for the whole bot
+		if (config.denyBots) {
+			if (message.author.bot) return(message.channel.send('This bot doesnt allow bots!'));
+		}
+
+	//Deny bots for this command
 	if (cmdFile.data.denyBots) {
 		if (message.author.bot) return(message.channel.send('This command doesnt allow bots!'));
 	}
@@ -121,6 +126,7 @@ module.exports = message => {
 
 	//Call the command
 	cmdFile.run({
+		client: client,
 		message: message,
 		args: args,
 		result: result,
