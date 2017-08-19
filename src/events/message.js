@@ -112,11 +112,12 @@ module.exports = message => {
 	syntax.optional = cmdFile.data.syntax.match(/\[[^\]]*]/g);
 
 	//Return if not enough args is specifyed!
-	if (args.length < syntax.required.length) {
-		message.channel.send('Not enough args spesifyed!\n\n__Syntax:__ `' + config.prefix + command + ' ' + cmdFile.data.syntax + '`');
-		return;
+	if (syntax.required) {
+		if (args.length < syntax.required.length) {
+			message.channel.send('Not enough args spesifyed!\n\n__Syntax:__ `' + config.prefix + command + ' ' + cmdFile.data.syntax + '`');
+			return;
+		}
 	}
-
 
 	//Call the command
 	cmdFile.run({
