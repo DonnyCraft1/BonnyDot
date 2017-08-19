@@ -12,7 +12,7 @@ exports.run = (inp) => {
   if (!quoteChannel) quoteChannel = inp.message.channel;
   quoteMsg = quoteChannel.fetchMessage(inp.args[0]).then((msg) => {
     let embed = new Discord.RichEmbed();
-    embed.addField('Content', msg.content, false);
+    embed.addField('Content', (msg.content) ? msg.content : '*Huh, this message has no content...*', false);
     embed.setTimestamp(msg.createdAt);
     embed.setFooter(msg.author.username, msg.author.avatarURL);
     embed.setColor('#11f1f8')
