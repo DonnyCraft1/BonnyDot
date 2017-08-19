@@ -6,8 +6,6 @@ module.exports = message => {
 
 
 	if (!message.content.startsWith(config.prefix)) return;
-	//if (message.author.bot) return;
-	//if (!message.author.id === config.devId) return(message.channel.send('Sorry! the commands is only avalible for Donny_Craft!'));
 
 	console.log(chalk.bgCyan.black('By ' + message.author.username) + '\n' + message.content + '\n\nGuild: ' + message.guild.name + '\nChannel: ' + message.channel.name);
 
