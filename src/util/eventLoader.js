@@ -1,5 +1,6 @@
-const reqEvent = (event) => require(`../events/${event}`);
 module.exports = client => {
-	client.on('ready', () => reqEvent('ready')(client));
-	client.on('message', reqEvent.bind(null, client));
+    const reqEvent = (event) => require(`../events/${event}`).bind(null, client);
+
+    client.on('ready', reqEvent('ready'));
+    client.on('message', reqEvent('message'));
 };

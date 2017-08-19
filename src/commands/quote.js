@@ -3,16 +3,10 @@ exports.run = (inp) => {
   let quoteGuild;
   let quoteChannel;
   let quoteMsg;
-  if (inp.args[2]) {
-    quoteGuild = inp.client.guilds.find('name', inp.args[2]);
-    if (!quoteGuild) quoteGuild = inp.client.guilds.get(inp.args[2]);
-  }
-
-  if (!quoteGuild) quoteGuild = inp.message.guild;
 
   if (inp.args[1]) {
-    quoteChannel = quoteGuild.channels.find('name', inp.args[1]);
-    if (!quoteChannel) quoteChannel = quoteGuild.channels.get(inp.args[1]);
+    quoteChannel = inp.message.guild.channels.find('name', inp.args[1]);
+    if (!quoteChannel) quoteChannel = inp.message.guild.channels.get(inp.args[1]);
   }
 
   if (!quoteChannel) quoteChannel = inp.message.channel;
@@ -20,10 +14,11 @@ exports.run = (inp) => {
     let embed = new Discord.RichEmbed();
     embed.addField('Content', msg.content, false);
     embed.setTimestamp(msg.createdAt);
-    embed.setFooter(msg.author.username, msg.author.avatarURL)
+    embed.setFooter(msg.author.username, msg.author.avatarURL);
+    embed.setColor('#11f1f8')
     inp.message.channel.send({embed});
   }).catch((err) => {
-    inp.message.channel.send('Invalid id!');
+    inp.message.channel.send('The message was not found!');
   })
 
 }
@@ -39,8 +34,8 @@ exports.data = {
     reason: ''
   },
   desc: 'Quote a message',
-  syntax: '<message id> [channel name or id] [guild name or id]',
-  timeout: 50000,
+  syntax: '<message id> [channel name or id]',
+  timeout: 5000,
   aliases: ['copy'],
   blocked: {
     //Key Value
