@@ -10,8 +10,6 @@ exports.run = (inp) => {
   	commandsList.forEach((file, index) => {
   		if (!file.match(/\.js$/)) commandsList.splice(index, 1);
   	});
-    console.log('catArr: ' + catArr);
-    console.log('commandsList: ' + commandsList);
     let commandsStringList = '';
     catArr.forEach((cat) => {
       commandsStringList += '\n\n**' + cat + '**';
