@@ -7,11 +7,14 @@ exports.run = (inp) => {
     quoteGuild = inp.client.guilds.find('name', inp.args[2]);
     if (!quoteGuild) quoteGuild = inp.client.guilds.get(inp.args[2]);
   }
-  if (inp.args[1]) {
-    quoteChannel = inp.message.guild.channels.find('name', inp.args[1]);
-    if (!quoteChannel) quoteChannel = inp.message.guild.channels.get(inp.args[1]);
-  }
+
   if (!quoteGuild) quoteGuild = inp.message.guild;
+
+  if (inp.args[1]) {
+    quoteChannel = quoteGuild.channels.find('name', inp.args[1]);
+    if (!quoteChannel) quoteChannel = quoteGuild.channels.get(inp.args[1]);
+  }
+
   if (!quoteChannel) quoteChannel = inp.message.channel;
   quoteMsg = quoteChannel.fetchMessage(inp.args[0]).then((msg) => {
     let embed = new Discord.RichEmbed();
