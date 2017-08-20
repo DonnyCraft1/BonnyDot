@@ -4,7 +4,7 @@ exports.run = (inp) => {
   let embed = new Discord.RichEmbed();
   function createEmbed (member) {
     embed.setImage(member.user.avatarURL);
-    embed.addField('Date here and now', Moment(Date.now()).format('DD.MM.YYYY hh:mm:ss'), 'true');
+    embed.addField('Date now', Moment(Date.now()).format('DD.MM.YYYY hh:mm:ss'), 'true');
     embed.addField('Account created', Moment(member.user.createdTimestamp).format('DD.MM.YYYY hh:mm:ss'), 'true');
     embed.addField('Joined this server', Moment(member.joinedTimestamp).format('DD.MM.YYYY hh:mm:ss'), 'true');
     embed.addField('ID', member.user.id, 'true');
@@ -64,7 +64,7 @@ exports.data = {
     isDisabled: false,
     reason: ''
   },
-  desc: 'Get information about a user, if no user provided, information about yourself is given! If it doesnt find the user, try with the user ID.',
+  desc: 'Get information about a user. if no user provided, information about yourself is given! If it doesnt find the user, try with the user ID.',
   syntax: '[user mention | username | nickname | user id]',
   timeout: 5000,
   aliases: ['userinfo', 'userinformation'],

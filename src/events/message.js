@@ -1,8 +1,9 @@
 const chalk = require('chalk');
 const config = require('../config.json');
 const fs = require('fs');
+
 let timeouts = {};
-module.exports = (client, message) => {
+module.exports = (client, dbConnection, message) => {
 
 
 	if (!message.content.startsWith(config.prefix)) return;
@@ -39,12 +40,12 @@ module.exports = (client, message) => {
 
 		//Deny bots for the whole bot
 		if (config.denyBots) {
-			if (message.author.bot) return(message.channel.send('This bot doesnt allow bots!'));
+			if (message.author.bot) return(message.channel.send('This bot doesn\'t allow bots!'));
 		}
 
 	//Deny bots for this command
 	if (cmdFile.data.denyBots) {
-		if (message.author.bot) return(message.channel.send('This command doesnt allow bots!'));
+		if (message.author.bot) return(message.channel.send('This command doesn\'t allow bots!'));
 	}
 
 	//Check if the command is disabled
@@ -129,6 +130,7 @@ module.exports = (client, message) => {
 
 	//Call the command
 	cmdFile.run({
+		dbConnection: dbConnection,
 		client: client,
 		message: message,
 		args: args,

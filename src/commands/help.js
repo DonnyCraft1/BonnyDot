@@ -82,7 +82,7 @@ exports.data = {
     reason: ''
   },
   desc: 'Get information and help for a command',
-  syntax: '[command name | category name]',
+  syntax: '[command name]',
   timeout: 0,
   aliases: ['info', 'commands', 'cmds'],
   blocked: {

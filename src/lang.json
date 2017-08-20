@@ -1,0 +1,88 @@
+[
+  {
+    "lang": "en",
+    "translator": {
+      "id": "162948860782575617",
+      "hideMe": false
+    },
+    "data": {
+      "other": {
+        "none": "none",
+        "true":  "true",
+        "false": "false"
+      },
+      "onMessage": {
+        "cmdNotInGuild": "",
+        "cmdNotExist": "",
+        "botDenyBots": "",
+        "cmdDenyBots": "",
+        "cmdDisabled": "{reason}",
+        "onlyOwner": "",
+        "guildBlockedCmd": "{reason}",
+        "userBlockedCmd": "{reason}",
+        "guildBlockedBot": "{reason}",
+        "userBlockedBot": "{reason}",
+        "missingPerms": "{permissions}",
+        "cooldown": "{cooldown}",
+        "syntaxName": "syntax",
+        "wrongSyntax": "{syntax}"
+      },
+      "commands": {
+        "8ball": {
+          "desc": "",
+          "syntax": "",
+          "answers": [],
+          "answer": "{user} asked {question}, and my answer is {answer}"
+        },
+        "google": {
+          "desc": "",
+          "syntax": "",
+        },
+        "help": {
+          "desc": "Get information and help for a command",
+          "syntax": "[command name]",
+          "descLessCmds": "Descriptionless commands",
+          "info": "Do `{helpCmd} <Command>`for more spesific information!",
+          "cmds": "Commands",
+          "cmdNotExist": "Sorry, that command does not exsist!",
+          "noDesc": "No description provided",
+          "permsReq": "Permissions required",
+          "botsDeny": "Bots denied",
+          "onlyDev": "Only developer",
+          "cmdDisabled": "{reason}",
+          "syntax": "Syntax",
+          "cooldownName": "Cooldown",
+          "cooldown": "{cooldown} seconds",
+          "aliases": "aliases"
+        },
+        "quote": {
+          "desc": "Quote a message",
+          "syntax": "<message id> [channel name or id]",
+          "content": "Content",
+          "noContent": "Huh, this message has no content...",
+          "noMessage": "The message was not found!"
+        },
+        "user": {
+          "desc": "Get information about a user. if no user provided, information about yourself is given! If it doesnt find the user, try with the user ID.",
+          "syntax": "[user mention | username | nickname | user id]",
+          "dateNow": "Date now",
+          "accountCreated": "Account created",
+          "joinedServer": "Joined this server",
+          "iD": "ID",
+          "username": "Username",
+          "nickname": "Nickname",
+          "noNick": "This user has no nickname set",
+          "discoriminator": "Discoiminator",
+          "status": "Status",
+          "gamePlaying": "Game playing",
+          "bOU": "Bot or user",
+          "highestRole": "Highes role",
+          "lastMsgId": "Last message sent ID",
+          "voiceChannel": "Voice channel",
+          "invalidMention": "Invalid mention!",
+          "noUser": "I did not find that user!"
+        }
+      }
+    }
+  }
+]
