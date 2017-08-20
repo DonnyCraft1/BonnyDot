@@ -7,13 +7,16 @@ module.exports = (client, message) => {
 
 	if (!message.content.startsWith(config.prefix)) return;
 
-	console.log(chalk.bgCyan.black('By ' + message.author.username) + '\n' + message.content + '\n\nGuild: ' + message.guild.name + '\nChannel: ' + message.channel.name);
 
 	const args = message.content.split(' ');
 	const command = args.shift().slice(config.prefix.length).toLowerCase();
 	const result = args.join(' ');
 
 	if (!command) return;
+	if(!message.member) return(message.channel.send('Ew, please use my commmands in a guild!'));
+
+	console.log(chalk.bgCyan.black('By ' + message.author.username) + '\n' + message.content + '\n\nGuild: ' + message.guild.name + '\nChannel: ' + message.channel.name);
+
 	let commandsList = fs.readdirSync('./commands/');
 	commandsList.forEach((file, index) => {
 		if (!file.match(/\.js$/)) commandsList.splice(index, 1);
