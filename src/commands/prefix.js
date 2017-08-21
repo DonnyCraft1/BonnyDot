@@ -2,14 +2,14 @@ const config = require('../config.json');
 exports.run = (inp) => {
   if (!inp.result) {
     let query0 = inp.dbConnection.query('SELECT prefix FROM guilds WHERE id = ?;', inp.message.guild.id, (err, row, fields) => {
-  console.log(row);
   if (!row[0]) {
-    inp.message.channel.send(config.prefix);
+    inp.message.channel.send(`\`${config.prefix}\``);
   } else {
-  inp.message.channel.send(row[0].prefix);
+  inp.message.channel.send(`\`${row[0].prefix}\``);
 }
 });
   } else {
+    inp.result = inp.result.replace(/{space}/gi, ' ');
       inp.dbConnection.query('SELECT * FROM guilds WHERE id = ?;', inp.message.guild.id, (err1, row1, fields1) => {
         if (err1) console.log('err1: ' + err1);
         if (row1[0]) {
