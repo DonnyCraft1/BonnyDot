@@ -15,12 +15,12 @@ exports.run = (inp) => {
         if (row1[0]) {
           inp.dbConnection.query(`UPDATE guilds SET prefix = ${inp.dbConnection.escape(inp.result)} WHERE id = ${inp.message.guild.id};`, (err2, row2, fields2) => {
             if (err2) console.log('err2: ' + err2);
-            inp.message.channel.send('Updated prefix for your guild!');
+            inp.message.channel.send('I updated my prefix to ' + inp.dbConnection.escape(inp.result) + '!');
               })
         } else {
           inp.dbConnection.query(`INSERT INTO guilds (id, prefix, language) VALUES (${inp.message.guild.id}, ${inp.dbConnection.escape(inp.result)}, 'en');`, (err3, row3, fields3) => {
             if (err3) console.log('err3: ' + err3);
-            inp.message.channel.send('Added prefix for your guild!');
+            inp.message.channel.send('I set my prefix to ' + inp.dbConnection.escape(inp.result) + '!');
           })
         }
 
