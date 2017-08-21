@@ -5,7 +5,7 @@ exports.run = (inp) => {
   if (!row[0]) {
     inp.message.channel.send(`\`${config.prefix}\``);
   } else {
-  inp.message.channel.send(`\`${row[0].prefix}\``);
+  inp.message.channel.send(`\`\`\`css\n${row[0].prefix}\`\`\``);
 }
 });
   } else {
