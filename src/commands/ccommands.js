@@ -13,7 +13,7 @@ exports.run = (inp) => {
       inp.message.channel.send('Please provide a name for the command you\'re about to create!');
       return;
     }
-    inp.dbConnection.query(`SELECT name FROM customcmds WHERE name="?" AND guild="${inp.message.guild.id}"`, inp.args[1], (err1, rows1) => {
+    inp.dbConnection.query(`SELECT name FROM customcmds WHERE name=? AND guild="${inp.message.guild.id}" AND deleted=0`, inp.args[1], (err1, rows1) => {
       if (err1) {
         inp.message.channel.send('An error occured!');
         console.log('err1: ' + err1);
@@ -23,16 +23,42 @@ exports.run = (inp) => {
         inp.message.channel.send('This command does already exist! But you\'re fine though, i did not overwrite it!');
         return;
       }
-        inp.dbConnection.query(`INSERT INTO customcmds (type, guild, creator, syntax, value, timestamp, permissions, name, channel) VALUES ("${defaults.type}", "${inp.message.guild.id}", "${inp.message.author.id}","${defaults.syntax}" , "${defaults.value}", "${Math.round(+new Date()/1000).toString()}","${defaults.permissions}" , "${inp.dbConnection.escape(inp.args[1])}", "${inp.message.channel.id}")`, err2 => {
+        inp.dbConnection.query(`INSERT INTO customcmds (type, guild, creator, syntax, value, timestamp, permissions, name, channel) VALUES ("${defaults.type}", "${inp.message.guild.id}", "${inp.message.author.id}","${defaults.syntax}" , "${defaults.value}", "${Math.round(+new Date()/1000).toString()}","${defaults.permissions}" , ${inp.dbConnection.escape(inp.args[1])}, "${inp.message.channel.id}")`, err2 => {
         if (err2) {
           inp.message.channel.send('An error occured!');
           console.log('err2: ' + err2);
           return;
         }
         inp.message.channel.send('Command created!');
+      });
+    });
+    break;
+    case 'delete':
+    if (!inp.args[1]) {
+      inp.message.channel.send('Please provide a name for the command you\'re about to delete!');
+      return;
+    }
+    inp.dbConnection.query(`SELECT name FROM customcmds WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild="${inp.message.guild.id}" AND deleted=0`, (err1, rows1) => {
+      if (err1) {
+          inp.message.channel.send('An error occured!');
+          console.log('err1: ' + err1);
         return;
-      })
+      }
+
+      if (!rows1[0]) {
+        inp.message.channel.send('I did not delete that command, but it is not here anymore. Guess why? It did not exist!')
+        return;
+      }
+      inp.dbConnection.query(`UPDATE customcmds SET deleted = 1, deletedby = "${inp.message.author.id}" WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild="${inp.message.guild.id}"`, (err2, rows2) => {
+        if (err2) {
+            inp.message.channel.send('An error occured!');
+            console.log('err2: ' + err2);
+          return;
+        }
+        inp.message.channel.send('Successfully deleted the command ' + inp.dbConnection.escape(inp.args[1]) + '!');
+      });
     })
+    break;
   }
 }
 exports.data = {
