@@ -1,4 +1,5 @@
 let types = ['message', 'pm', 'addroles', 'removeroles', 'toggleroles']
+const Discord = require('discord.js');
 let defaults = {
   type: 'message',
   syntax: '',
@@ -134,6 +135,58 @@ inp.args[2] = inp.args[2].toLowerCase();
       inp.message.channel.send('I\'ve created a new command ( ' + inp.dbConnection.escape(inp.args[2]) + ' ) with the exact same settings as the command ' + inp.dbConnection.escape(inp.args[1]) + '!');
     });
   });
+    break;
+    case 'rename':
+    if (!inp.args[1]) {
+      inp.message.channel.send('Please provide the name of the command you want to rename!');
+      return;
+    }
+    if (!inp.args[2]) {
+      inp.message.channel.send('Please provide a new name for the command!');
+      return;
+    }
+    inp.dbConnection.query(`SELECT * FROM customcmds WHERE guild="${inp.message.guild.id}" AND deleted=0`, (err1, rows1) => {
+      if (err1) {
+        inp.message.channel.send('An error occured!');
+        console.log('err1: ' + err1);
+        return;
+      }
+      let fromExist = false;
+      let toExist = false;
+      rows1.forEach((row) => {
+      if(row.name === inp.args[1]) fromExist = true;
+      if(row.name === inp.args[2]) toExist = true;
+    })
+    if (!fromExist) {
+      inp.message.channel.send('The command you want to rename does not exist!');
+      return;
+    }
+    if (toExist) {
+      inp.message.channel.send('A command with the new name does already exist!');
+      return;
+    }
+    inp.dbConnection.query(`UPDATE customcmds SET name=${inp.dbConnection.escape(inp.args[2])} WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild=${inp.dbConnection.escape(inp.message.guild.id)} AND deleted=0`, (err2) => {
+      if (err2) {
+        inp.message.channel.send('An error occured!');
+        console.log('err2: ' + err2);
+        return;
+      }
+      inp.message.channel.send('I\'ve renamed the command ' + inp.dbConnection.escape(inp.args[2]) + ' to ' + inp.dbConnection.escape(inp.args[1]) + '!');
+    });
+  });
+    break;
+    case 'list':
+    inp.dbConnection.query(`SELECT * FROM customcmds WHERE guild='${inp.message.guild.id}' AND deleted=0`, (err1, rows1) => {
+      let embed = new Discord.RichEmbed();
+      embed.setColor('#772244');
+      embed.setTitle('All avalible custom commands for this guilds');
+      rows1.forEach(row => {
+          let authorOfCommand = (inp.message.guild.members.get(row.creator)) ? inp.message.guild.members.get(row.creator).user.username : 'I did not see the author of this command in this guild, hes id is ' + row.creator;
+          embed.addField(row.name, '```\nType: ' + row.type + '\nPermissions required: ' + row.permissions.split(';').join(', ') + '\nSyntax, how many args: ' + row.syntax + '\nCreator of command: ' + authorOfCommand + '\nValue: ' + row.value + '\n```');
+      });
+
+      inp.message.channel.send({embed});
+    });
     break;
   }
 }
