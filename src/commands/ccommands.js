@@ -9,6 +9,9 @@ exports.run = (inp) => {
   if (inp.args[1]) {
   inp.args[1] = inp.args[1].toLowerCase();
 }
+if (inp.args[2]) {
+inp.args[2] = inp.args[2].toLowerCase();
+}
   if (!inp.args[0]) inp.message.channel.send('Wrong syntax!\n\nSyntax: `' + exports.data.syntax + '`');
   switch(inp.args[0]) {
     case 'create':
@@ -32,7 +35,7 @@ exports.run = (inp) => {
           console.log('err2: ' + err2);
           return;
         }
-        inp.message.channel.send('Command created with the name ' + inp.args[1] + '!');
+        inp.message.channel.send('Command created with the name ' + inp.dbConnection.escape(inp.args[1]) + '!');
       });
     });
     break;
@@ -94,14 +97,44 @@ exports.run = (inp) => {
     })
     break;
     case 'copy':
-    if (!args[0]) {
+    if (!inp.args[1]) {
       inp.message.channel.send('Please provide the name of the command you want to copy!');
+      return;
     }
-    if (!args[0]) {
+    if (!inp.args[2]) {
       inp.message.channel.send('Please provide a name for the new command!');
+      return;
     }
+    inp.dbConnection.query(`SELECT * FROM customcmds WHERE guild="${inp.message.guild.id}" AND deleted=0`, (err1, rows1) => {
+      if (err1) {
+        inp.message.channel.send('An error occured!');
+        console.log('err1: ' + err1);
+        return;
+      }
+      let fromExist = false;
+      let toExist = false;
+      rows1.forEach((row) => {
+      if(row.name === inp.args[1]) fromExist = true;
+      if(row.name === inp.args[2]) toExist = true;
+    })
+    if (!fromExist) {
+      inp.message.channel.send('The command you want to copy from does not exist!');
+      return;
+    }
+    if (toExist) {
+      inp.message.channel.send('The command you want to create does already exist!');
+      return;
+    }
+    inp.dbConnection.query(`INSERT INTO customcmds (type, guild, creator, syntax, value, timestamp, permissions, name, channel, deleted, deletedby, aliases) SELECT customcmds.type, customcmds.guild, customcmds.creator, customcmds.syntax, customcmds.value, customcmds.timestamp, customcmds.permissions, ${inp.dbConnection.escape(inp.args[2])}, customcmds.channel, customcmds.deleted, customcmds.deletedby, customcmds.aliases FROM customcmds WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild=${inp.dbConnection.escape(inp.message.guild.id)} AND deleted=0`, (err2) => {
+      if (err2) {
+        inp.message.channel.send('An error occured!');
+        console.log('err2: ' + err2);
+        return;
+      }
+      inp.message.channel.send('I\'ve created a new command ( ' + inp.dbConnection.escape(inp.args[2]) + ' ) with the exact same settings as the command ' + inp.dbConnection.escape(inp.args[1]) + '!');
+    });
+  });
     break;
-
   }
 }
 exports.data = {
@@ -115,7 +148,7 @@ exports.data = {
     isDisabled: false,
     reason: ''
   },
-  desc: '',
+  desc: 'Custom commads is commands you can make, that is only for your guild! Sounds fun, right?',
   syntax: '<create <name> | delete <name> | settype <name> <type> | setsyntax <name> <syntax> | setperms <name> <permission;permission;permission...> | setvalue <name> <value> | list>',
   ignoreSyntax: true,
   timeout: 0,
