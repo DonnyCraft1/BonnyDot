@@ -1,4 +1,27 @@
-let types = ['message', 'pm', 'addroles', 'removeroles', 'toggleroles']
+let types = ['message', 'pm', 'addroles', 'removeroles', 'toggleroles'];
+////
+let reservedCommandsList = fs.readdirSync('./commands/');
+commandsList.forEach((file, index) => {
+  if (!file.match(/\.js$/)) commandsList.splice(index, 1);
+});
+let allReservedCommands = new Map();
+
+function removeJS (value) {
+  return value.replace(/\.js$/, '');
+};
+
+commandsList.forEach((cmdName, index) => {
+  allCommands.set(removeJS(cmdName), removeJS(cmdName));
+  let aliases = require(`../commands/${cmdName}`).data.aliases;
+  aliases.forEach((alias, index2) => allCommands.set(removeJS(alias), removeJS(cmdName)));
+});
+
+  // if (allReservedCommands.has()) {
+  //   inp.message.channel.send('This command is reserverd for the bot!');
+  //   return;
+  // }
+////
+
 const Discord = require('discord.js');
 let defaults = {
   type: 'message',
@@ -19,6 +42,10 @@ inp.args[2] = inp.args[2].toLowerCase();
     if (!inp.args[1]) {
       inp.message.channel.send('Please provide a name for the command you\'re about to create!');
       return;
+    }
+    if (allReservedCommands.has(inp.args[1])) {
+    inp.message.channel.send('This command is reserverd for the bot!');
+    return;
     }
     inp.dbConnection.query(`SELECT name FROM customcmds WHERE name=? AND guild="${inp.message.guild.id}" AND deleted=0`, inp.args[1], (err1, rows1) => {
       if (err1) {
@@ -106,6 +133,10 @@ inp.args[2] = inp.args[2].toLowerCase();
       inp.message.channel.send('Please provide a name for the new command!');
       return;
     }
+    if (allReservedCommands.has(inp.args[2])) {
+    inp.message.channel.send('This command is reserverd for the bot!');
+    return;
+    }
     inp.dbConnection.query(`SELECT * FROM customcmds WHERE guild="${inp.message.guild.id}" AND deleted=0`, (err1, rows1) => {
       if (err1) {
         inp.message.channel.send('An error occured!');
@@ -144,6 +175,10 @@ inp.args[2] = inp.args[2].toLowerCase();
     if (!inp.args[2]) {
       inp.message.channel.send('Please provide a new name for the command!');
       return;
+    }
+    if (allReservedCommands.has(inp.args[2])) {
+    inp.message.channel.send('This command is reserverd for the bot!');
+    return;
     }
     inp.dbConnection.query(`SELECT * FROM customcmds WHERE guild="${inp.message.guild.id}" AND deleted=0`, (err1, rows1) => {
       if (err1) {
