@@ -23,11 +23,13 @@ exports.run = (inp) => {
         inp.message.channel.send('This command does already exist! But you\'re fine though, i did not overwrite it!');
         return;
       }
-        inp.dbConnection.query(`INSERT INTO customcmds (type, guild, creator, syntax, value, timestamp, permissions, name) VALUES ("${defaults.type}", "${inp.message.guild.id}", "${inp.message.author.id}","${defaults.syntax}" , "${defaults.value}", "${Math.round(+new Date()/1000).toString()}","${defaults.permissions}" , "${inp.dbConnection.escape(inp.args[1])}")`, err2 => {
+        inp.dbConnection.query(`INSERT INTO customcmds (type, guild, creator, syntax, value, timestamp, permissions, name, channel) VALUES ("${defaults.type}", "${inp.message.guild.id}", "${inp.message.author.id}","${defaults.syntax}" , "${defaults.value}", "${Math.round(+new Date()/1000).toString()}","${defaults.permissions}" , "${inp.dbConnection.escape(inp.args[1])}", "${inp.message.channel.id}")`, err2 => {
         if (err2) {
           inp.message.channel.send('An error occured!');
           console.log('err2: ' + err2);
+          return;
         }
+        inp.message.channel.send('Command created!');
         return;
       })
     })
