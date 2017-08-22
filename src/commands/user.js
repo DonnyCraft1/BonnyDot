@@ -66,6 +66,7 @@ exports.data = {
   },
   desc: 'Get information about a user. if no user provided, information about yourself is given! If it doesnt find the user, try with the user ID.',
   syntax: '[user mention | username | nickname | user id]',
+  ignoreSyntax: false,
   timeout: 5000,
   aliases: ['userinfo', 'userinformation'],
   blocked: {

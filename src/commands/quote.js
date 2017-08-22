@@ -35,6 +35,7 @@ exports.data = {
   },
   desc: 'Quote a message',
   syntax: '<message id> [channel name or id]',
+  ignoreSyntax: false,
   timeout: 5000,
   aliases: ['copy'],
   blocked: {

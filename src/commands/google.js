@@ -16,6 +16,7 @@ exports.data = {
   },
   desc: 'Perfectly for showing people "You can google it!"',
   syntax: '',
+  ignoreSyntax: false,
   timeout: 2000,
   aliases: ['howtogoogle', 'search'],
   blocked: {

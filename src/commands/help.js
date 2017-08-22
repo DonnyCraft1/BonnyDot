@@ -83,6 +83,7 @@ exports.data = {
   },
   desc: 'Get information and help for a command',
   syntax: '[command name]',
+  ignoreSyntax: false,
   timeout: 0,
   aliases: ['info', 'commands', 'cmds'],
   blocked: {

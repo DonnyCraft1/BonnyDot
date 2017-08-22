@@ -37,6 +37,7 @@ exports.data = {
   },
   desc: 'Ask a question, and I\'ll tell if it\'s true!',
   syntax: '<question>',
+  ignoreSyntax: false,
   timeout: 1000,
   aliases: [],
   blocked: {

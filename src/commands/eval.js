@@ -29,6 +29,7 @@ exports.data = {
   },
   desc: 'Evaluate js code',
   syntax: '<code>',
+  ignoreSyntax: false,
   timeout: 0,
   aliases: [],
   blocked: {

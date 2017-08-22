@@ -132,6 +132,9 @@ module.exports = (client, dbConnection, message) => {
 		}
 
 
+		//If check syntax, check syntax
+
+		if (!cmdFile.data.ignoreSyntax) {
 
 		//Check syntax
 		let syntax = {};
@@ -145,6 +148,7 @@ module.exports = (client, dbConnection, message) => {
 				return;
 			}
 		}
+	}
 
 		//Call the command
 		cmdFile.run({

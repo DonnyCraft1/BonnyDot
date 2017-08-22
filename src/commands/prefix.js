@@ -39,6 +39,7 @@ exports.data = {
   },
   desc: 'Set the prefix for your guild, or view the current one',
   syntax: '[new prefix]',
+  ignoreSyntax: false,
   timeout: 0,
   aliases: ['setprefix'],
   blocked: {
