@@ -1,8 +1,9 @@
-let types = ['message', 'pm', 'addroles', 'removeroles', 'toggleroles'];
+const fs = require('fs');
+let types = ['message'/*, 'pm', 'addroles', 'removeroles', 'toggleroles'*/];
 ////
 let reservedCommandsList = fs.readdirSync('./commands/');
-commandsList.forEach((file, index) => {
-  if (!file.match(/\.js$/)) commandsList.splice(index, 1);
+reservedCommandsList.forEach((file, index) => {
+  if (!file.match(/\.js$/)) reservedCommandsList.splice(index, 1);
 });
 let allReservedCommands = new Map();
 
@@ -10,10 +11,15 @@ function removeJS (value) {
   return value.replace(/\.js$/, '');
 };
 
-commandsList.forEach((cmdName, index) => {
-  allCommands.set(removeJS(cmdName), removeJS(cmdName));
-  let aliases = require(`../commands/${cmdName}`).data.aliases;
-  aliases.forEach((alias, index2) => allCommands.set(removeJS(alias), removeJS(cmdName)));
+console.log(reservedCommandsList);
+reservedCommandsList.forEach((cmdName, index) => {
+  allReservedCommands.set(removeJS(cmdName), removeJS(cmdName));
+  console.log(index);
+  console.log(__dirname);
+  let aliases = require(`${__dirname + cmdName}`).data.aliases;
+  console.log(aliases);
+  console.log(index);
+  aliases.forEach((alias, index2) => allReservedCommands.set(removeJS(alias), removeJS(cmdName)));
 });
 
   // if (allReservedCommands.has()) {
@@ -364,6 +370,40 @@ inp.dbConnection.query(`UPDATE customcmds SET permissions=${inp.dbConnection.esc
     return;
   }
   inp.message.channel.send('Successfully updated/set the permissions for the command ' + inp.dbConnection.escape(inp.args[1]));
+});
+});
+break;
+case 'settype':
+if (!inp.args[1]) {
+  inp.message.channel.send('Please provide a command!');
+  return;
+}
+if (!inp.args[2]) {
+  inp.message.channel.send('Please provide a type!');
+  return;
+}
+if (!types.includes(inp.args[2])) {
+  inp.message.channel.send('Invalid type!\nI accept: ' + types.join(', '));
+  return;
+}
+
+inp.dbConnection.query(`SELECT * FROM customcmds WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild="${inp.message.guild.id}" AND deleted=0`, (err1, rows1) => {
+  if (err1) {
+    inp.message.channel.send('An error occured!');
+    console.log('err1: ' + err1);
+    return;
+  }
+  if (!rows1[0]) {
+    inp.message.channel.send('The command does not exist!');
+    return;
+  }
+inp.dbConnection.query(`UPDATE customcmds SET type=${inp.dbConnection.escape(inp.args[2])} WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild=${inp.dbConnection.escape(inp.message.guild.id)} AND deleted=0`, (err2) => {
+  if (err2) {
+    inp.message.channel.send('An error occured!');
+    console.log('err2: ' + err2);
+    return;
+  }
+  inp.message.channel.send('Successfully updated the type for the command ' + inp.dbConnection.escape(inp.args[1]));
 });
 });
 break;
