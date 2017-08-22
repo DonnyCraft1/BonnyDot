@@ -15,8 +15,12 @@ console.log(reservedCommandsList);
 reservedCommandsList.forEach((cmdName, index) => {
   allReservedCommands.set(removeJS(cmdName), removeJS(cmdName));
   console.log(index);
-  console.log(__dirname);
-  let aliases = require(`${__dirname + cmdName}`).data.aliases;
+  let aliases = [];
+  if (!cmdName === 'ccomands') {
+  aliases = require(`./${cmdName}`).data.aliases;
+} else {
+  aliases = exports.data.aliases;
+}
   console.log(aliases);
   console.log(index);
   aliases.forEach((alias, index2) => allReservedCommands.set(removeJS(alias), removeJS(cmdName)));
