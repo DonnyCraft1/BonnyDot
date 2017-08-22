@@ -13,7 +13,7 @@ exports.run = (inp) => {
       inp.message.channel.send('Please provide a name for the command you\'re about to create!');
       return;
     }
-    inp.dbConnection.query(`SELECT name FROM customcmds WHERE name=? AND guild=${inp.message.guild.id}`, inp.args[1], (err1, rows1) => {
+    inp.dbConnection.query(`SELECT name FROM customcmds WHERE name="?" AND guild="${inp.message.guild.id}"`, inp.args[1], (err1, rows1) => {
       if (err1) {
         inp.message.channel.send('An error occured!');
         console.log('err1: ' + err1);
