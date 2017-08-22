@@ -2,7 +2,7 @@ let types = ['message', 'pm', 'addroles', 'removeroles', 'toggleroles']
 const Discord = require('discord.js');
 let defaults = {
   type: 'message',
-  syntax: '',
+  syntax: 0,
   value: 'Please change this message! Or it will stay as is',
   permissions: 'MANAGE_GUILD'
 };
@@ -180,6 +180,7 @@ inp.args[2] = inp.args[2].toLowerCase();
       let embed = new Discord.RichEmbed();
       embed.setColor('#772244');
       embed.setTitle('All avalible custom commands for this guilds');
+      embed.addBlankField();
       rows1.forEach(row => {
           let authorOfCommand = (inp.message.guild.members.get(row.creator)) ? inp.message.guild.members.get(row.creator).user.username : 'I did not see the author of this command in this guild, hes id is ' + row.creator;
           embed.addField(row.name, '```\nType: ' + row.type + '\nPermissions required: ' + row.permissions.split(';').join(', ') + '\nSyntax, how many args: ' + row.syntax + '\nCreator of command: ' + authorOfCommand + '\nValue: ' + row.value + '\n```');
@@ -188,6 +189,149 @@ inp.args[2] = inp.args[2].toLowerCase();
       inp.message.channel.send({embed});
     });
     break;
+    case 'setsyntax':
+    if (!inp.args[1]) {
+      inp.message.channel.send('Please provide a command!');
+      return;
+    }
+    if (!inp.args[2]) {
+      inp.message.channel.send('Please provide the number of arguments you want for your command (syntax)!');
+      return;
+    }
+    let syntax = parseInt(inp.args[2]);
+    if (isNaN(syntax)) {
+      inp.message.channel.send('The syntax must be a valid number!');
+      return;
+    }
+    if (syntax < 0 || syntax > 15) {
+      inp.message.channel.send('You can only have a value between 0 and 15 as the syntax!');
+      return;
+    }
+    inp.dbConnection.query(`SELECT * FROM customcmds WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild="${inp.message.guild.id}" AND deleted=0`, (err1, rows1) => {
+      if (err1) {
+        inp.message.channel.send('An error occured!');
+        console.log('err1: ' + err1);
+        return;
+      }
+      if (!rows1[0]) {
+        inp.message.channel.send('The command does not exist!');
+        return;
+      }
+    inp.dbConnection.query(`UPDATE customcmds SET syntax=${inp.dbConnection.escape(inp.args[2])} WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild=${inp.dbConnection.escape(inp.message.guild.id)} AND deleted=0`, (err2) => {
+      if (err2) {
+        inp.message.channel.send('An error occured!');
+        console.log('err2: ' + err2);
+        return;
+      }
+      inp.message.channel.send('Successfully updated/set the syntax for the command ' + inp.dbConnection.escape(inp.args[1]));
+    });
+  });
+  break;
+  case 'setvalue':
+  if (!inp.args[1]) {
+    inp.message.channel.send('Please provide a command!');
+    return;
+  }
+  if (!inp.args[2]) {
+    inp.message.channel.send('Please provide a value!');
+    return;
+  }
+  let value = inp.result.substring((inp.args[0].length + inp.args[1].length) + 2, inp.result.length);
+
+  inp.dbConnection.query(`SELECT * FROM customcmds WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild="${inp.message.guild.id}" AND deleted=0`, (err1, rows1) => {
+    if (err1) {
+      inp.message.channel.send('An error occured!');
+      console.log('err1: ' + err1);
+      return;
+    }
+    if (!rows1[0]) {
+      inp.message.channel.send('The command does not exist!');
+      return;
+    }
+  inp.dbConnection.query(`UPDATE customcmds SET value=${inp.dbConnection.escape(value)} WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild=${inp.dbConnection.escape(inp.message.guild.id)} AND deleted=0`, (err2) => {
+    if (err2) {
+      inp.message.channel.send('An error occured!');
+      console.log('err2: ' + err2);
+      return;
+    }
+    inp.message.channel.send('Successfully updated/set the value for the command ' + inp.dbConnection.escape(inp.args[1]));
+  });
+});
+break;
+case 'setdescription':
+if (!inp.args[1]) {
+  inp.message.channel.send('Please provide a command!');
+  return;
+}
+if (!inp.args[2]) {
+  inp.message.channel.send('Please provide a description!');
+  return;
+}
+let description = inp.result.substring((inp.args[0].length + inp.args[1].length) + 2, inp.result.length);
+
+inp.dbConnection.query(`SELECT * FROM customcmds WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild="${inp.message.guild.id}" AND deleted=0`, (err1, rows1) => {
+  if (err1) {
+    inp.message.channel.send('An error occured!');
+    console.log('err1: ' + err1);
+    return;
+  }
+  if (!rows1[0]) {
+    inp.message.channel.send('The command does not exist!');
+    return;
+  }
+inp.dbConnection.query(`UPDATE customcmds SET description=${inp.dbConnection.escape(description)} WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild=${inp.dbConnection.escape(inp.message.guild.id)} AND deleted=0`, (err2) => {
+  if (err2) {
+    inp.message.channel.send('An error occured!');
+    console.log('err2: ' + err2);
+    return;
+  }
+  inp.message.channel.send('Successfully updated/set the description for the command ' + inp.dbConnection.escape(inp.args[1]));
+});
+});
+break;
+case 'setpermissions':
+if (!inp.args[1]) {
+  inp.message.channel.send('Please provide a command!');
+  return;
+}
+if (!inp.args[2]) {
+  inp.message.channel.send('Please provide one or more permissions! Do "' + inp.config.prefix + 'discord_permissions" to see all the discord permission that are avalible! Remember to split the permissions with `;` and no spaces');
+  return;
+}
+inp.args[2] = inp.args[2].toUpperCase();
+
+let allDiscordPermissions = require('./discord_permissions');
+allDiscordPermissions = allDiscordPermissions.permissions.channel.concat(allDiscordPermissions.permissions.guild);
+let wrongPerms = false;
+inp.args[2].split(';').forEach((userPerm) => {
+  if (allDiscordPermissions.indexOf(userPerm) === -1) {
+    inp.message.channel.send('Invalid permissions!');
+    wrongPerms = true;
+    return;
+  }
+})
+if (wrongPerms) return;
+
+inp.dbConnection.query(`SELECT * FROM customcmds WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild="${inp.message.guild.id}" AND deleted=0`, (err1, rows1) => {
+  if (err1) {
+    inp.message.channel.send('An error occured!');
+    console.log('err1: ' + err1);
+    return;
+  }
+  if (!rows1[0]) {
+    inp.message.channel.send('The command does not exist!');
+    return;
+  }
+inp.dbConnection.query(`UPDATE customcmds SET permissions=${inp.dbConnection.escape(inp.args[2])} WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild=${inp.dbConnection.escape(inp.message.guild.id)} AND deleted=0`, (err2) => {
+  if (err2) {
+    inp.message.channel.send('An error occured!');
+    console.log('err2: ' + err2);
+    return;
+  }
+  inp.message.channel.send('Successfully updated/set the permissions for the command ' + inp.dbConnection.escape(inp.args[1]));
+});
+});
+break;
   }
 }
 exports.data = {
@@ -204,7 +348,7 @@ exports.data = {
   desc: 'Custom commads is commands you can make, that is only for your guild! Sounds fun, right?',
   syntax: '<create <name> | delete <name> | settype <name> <type> | setsyntax <name> <syntax> | setperms <name> <permission;permission;permission...> | setvalue <name> <value> | list>',
   ignoreSyntax: true,
-  timeout: 0,
+  timeout: 2000,
   aliases: ['custom_commands', 'ccmds'],
   blocked: {
     guilds: {},
