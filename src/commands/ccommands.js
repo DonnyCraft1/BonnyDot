@@ -199,7 +199,7 @@ inp.args[2] = inp.args[2].toLowerCase();
     inp.dbConnection.query(`SELECT * FROM customcmds WHERE guild='${inp.message.guild.id}' AND deleted=0`, (err1, rows1) => {
       let embed = new Discord.RichEmbed();
       embed.setColor('#772244');
-      embed.setTitle('All avalible custom commands for this guilds');
+      embed.setTitle('All avalible custom commands for this guild');
       embed.addBlankField();
       rows1.forEach(row => {
           let cmdDescription = (row.description) ? row.description : 'No description provided';

@@ -6,9 +6,9 @@ let timeouts = {};
 module.exports = (client, dbConnection, message) => {
 	let lang;
 	let prefix;
-	dbConnection.query('SELECT * FROM guilds WHERE id = ?', message.guild.id, (err, rows) => {
-		if (err) console.log(err);
-		if (rows[0]) {
+	dbConnection.query('SELECT * FROM guilds WHERE id = ?', message.guild.id, (err2, rows2) => {
+		if (err2) console.log(err2);
+		if (rows2[0]) {
 			lang = rows[0].language;
 			prefix = rows[0].prefix;
 		} else {
@@ -31,6 +31,10 @@ module.exports = (client, dbConnection, message) => {
 		const command = message.content.substring(prefix.length, message.content.length - result.length).replace(/\s+/g, '');
 		console.log('cmd: \'' + command + '\'');
 		console.log('result: ' + result);
+		inp.dbConnection.query(`SELECT * FROM customcmds WHERE name=? AND guild="${inp.message.guild.id}" AND deleted=0`, command, (err1, rows1) => {
+
+			if (rows1[1])
+
 		if (!command) return;
 		if(!message.member) return(message.channel.send('Ew, please use my commmands in a guild!'));
 
@@ -45,6 +49,8 @@ module.exports = (client, dbConnection, message) => {
 		function removeJS (value) {
 			return value.replace(/\.js$/, '');
 		};
+
+		if (rows2[0])
 
 		commandsList.forEach((cmdName, index) => {
 			allCommands.set(removeJS(cmdName), removeJS(cmdName));
@@ -162,5 +168,6 @@ module.exports = (client, dbConnection, message) => {
 			result: result,
 			config: config
 		});
-	})
+	});
+});
 };
