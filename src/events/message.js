@@ -31,7 +31,7 @@ module.exports = (client, dbConnection, message) => {
 		const command = message.content.substring(prefix.length, message.content.length - result.length).replace(/\s+/g, '');
 		console.log('cmd: \'' + command + '\'');
 		console.log('result: ' + result);
-		inp.dbConnection.query(`SELECT * FROM customcmds WHERE name=? AND guild="${inp.message.guild.id}" AND deleted=0`, command, (err1, rows1) => {
+		dbConnection.query(`SELECT * FROM customcmds WHERE name=? AND guild="${message.guild.id}" AND deleted=0`, command, (err1, rows1) => {
 
 			if (rows1[1])
 
