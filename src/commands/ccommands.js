@@ -1,32 +1,7 @@
 const fs = require('fs');
 let types = ['message'/*, 'pm', 'addroles', 'removeroles', 'toggleroles'*/];
 ////
-let reservedCommandsList = fs.readdirSync('./commands/');
-reservedCommandsList.forEach((file, index) => {
-  if (!file.match(/\.js$/)) reservedCommandsList.splice(index, 1);
-});
-let allReservedCommands = new Map();
-
-function removeJS (value) {
-  return value.replace(/\.js$/, '');
-};
-
-console.log(reservedCommandsList);
-reservedCommandsList.forEach((cmdName, index) => {
-  allReservedCommands.set(removeJS(cmdName), removeJS(cmdName));
-  console.log(index);
-  let aliases = [];
-  if (!cmdName === 'ccomands') {
-  aliases = require(`./${cmdName}`).data.aliases;
-} else {
-  aliases = exports.data.aliases;
-}
-  console.log(aliases);
-  console.log(index);
-  aliases.forEach((alias, index2) => allReservedCommands.set(removeJS(alias), removeJS(cmdName)));
-});
-
-  // if (allReservedCommands.has()) {
+  // if (inp.allCommands.has()) {
   //   inp.message.channel.send('This command is reserverd for the bot!');
   //   return;
   // }
@@ -53,7 +28,7 @@ inp.args[2] = inp.args[2].toLowerCase();
       inp.message.channel.send('Please provide a name for the command you\'re about to create!');
       return;
     }
-    if (allReservedCommands.has(inp.args[1])) {
+    if (inp.allCommands.has(inp.args[1])) {
     inp.message.channel.send('This command is reserverd for the bot!');
     return;
     }
@@ -143,7 +118,7 @@ inp.args[2] = inp.args[2].toLowerCase();
       inp.message.channel.send('Please provide a name for the new command!');
       return;
     }
-    if (allReservedCommands.has(inp.args[2])) {
+    if (inp.allCommands.has(inp.args[2])) {
     inp.message.channel.send('This command is reserverd for the bot!');
     return;
     }
@@ -186,7 +161,7 @@ inp.args[2] = inp.args[2].toLowerCase();
       inp.message.channel.send('Please provide a new name for the command!');
       return;
     }
-    if (allReservedCommands.has(inp.args[2])) {
+    if (inp.allCommands.has(inp.args[2])) {
     inp.message.channel.send('This command is reserverd for the bot!');
     return;
     }
@@ -227,8 +202,9 @@ inp.args[2] = inp.args[2].toLowerCase();
       embed.setTitle('All avalible custom commands for this guilds');
       embed.addBlankField();
       rows1.forEach(row => {
+          let cmdDescription = (row.description) ? row.description : 'No description provided';
           let authorOfCommand = (inp.message.guild.members.get(row.creator)) ? inp.message.guild.members.get(row.creator).user.username : 'I did not see the author of this command in this guild, hes id is ' + row.creator;
-          embed.addField(row.name, '```\nType: ' + row.type + '\nPermissions required: ' + row.permissions.split(';').join(', ') + '\nSyntax, how many args: ' + row.syntax + '\nCreator of command: ' + authorOfCommand + '\nValue: ' + row.value + '\n```');
+          embed.addField('__**' + row.name + '**__', '**Type: **' + row.type + '\n**Permissions: **' + row.permissions.split(';').join(', ') + '\n**Syntax:** ' + row.syntax + '\n**Creator:** ' + authorOfCommand + '\n**Description:** ' + cmdDescription + '\n**Value:** ' + row.value + '\n');
       });
 
       inp.message.channel.send({embed});

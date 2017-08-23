@@ -152,6 +152,7 @@ module.exports = (client, dbConnection, message) => {
 
 		//Call the command
 		cmdFile.run({
+			allCommands: allCommands,
 			prefix: prefix,
 			lang: lang,
 			dbConnection: dbConnection,
