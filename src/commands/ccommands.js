@@ -1,3 +1,27 @@
+//Add extra field for ccmds with NOT NULL, with optional other commands to be executed, but they again wont execute more commands. ccmds also need a field for
+//the command to not be able to executed directly.
+
+//Create a file for every cmd
+//And make a command to get the file, that has the value of the command;
+
+//Allowed values for action in customdelete ['delete', 'recover'];
+//Check if the command is deleted:
+/*
+inp.dbConnection.query(`SELECT * FROM customdelete WHERE cmdId=?`, 'ID OF COMMAND', (err3, rows3) => {
+  if (rows3[0]) {
+    let newestAction;
+    rows3.forEach((item3, i3) => {
+      if (!i3 > 0) {
+        newestAction = item3;
+        continue;
+      }
+      if (item3.timestamp > newestAction.timestamp) newestAction = item3;
+    });
+    if (newestAction.action === 'delete') return (inp.message.channel.send('The last record says this command is deleted!'))
+  }
+  //Hurray, it isnt deleted
+});
+*/
 const fs = require('fs');
 let types = ['message'/*, 'pm', 'addroles', 'removeroles', 'toggleroles'*/];
 ////
@@ -57,18 +81,34 @@ inp.args[2] = inp.args[2].toLowerCase();
       inp.message.channel.send('Please provide a name for the command you\'re about to delete!');
       return;
     }
-    inp.dbConnection.query(`SELECT name, id FROM customcmds WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild="${inp.message.guild.id}" AND deleted=0`, (err1, rows1) => {
+    if (!inp.args[2]) {
+      inp.message.channel.send('Please provide a reason why you want to delete this command!');
+      return;
+    }
+    inp.dbConnection.query(`SELECT * FROM customcmds WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild="${inp.message.guild.id}"`, (err1, rows1) => {
       if (err1) {
           inp.message.channel.send('An error occured!');
           console.log('err1: ' + err1);
         return;
       }
-
       if (!rows1[0]) {
         inp.message.channel.send('I did not delete that command, but it is not here anymore. Guess why? It did not exist!')
         return;
       }
-      inp.dbConnection.query(`UPDATE customcmds SET deleted = 1, deletedby = "${inp.message.author.id}" WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild="${inp.message.guild.id}"`, (err2, rows2) => {
+      inp.dbConnection.query(`SELECT * FROM customdelete WHERE cmdId=?`, rows1[0].id, (err3, rows3) => {
+        if (rows3[0]) {
+          let newestAction;
+          rows3.forEach((item3, i3) => {
+            if (!i3 > 0) {
+              newestAction = item3;
+              return; //Skip this index;
+            }
+            if (item3.timestamp > newestAction.timestamp) newestAction = item3;
+          });
+          if (newestAction.action === 'delete') return (inp.message.channel.send('I did not delete that command, but it is not here anymore. Guess why? It did not exist!'))
+        }
+        //Hurray, it isnt deleted
+      inp.dbConnection.query(`INSERT INTO customdelete (cmdId, reason, deletedBy, channel, action, timeStamp) VALUES("${rows1[0].id}", ${inp.dbConnection.escape(inp.args[2])}, "${inp.message.author.id}", "${inp.message.channel.id}", "delete", "${Math.round(+new Date()/1000).toString()}")`, (err2, rows2) => {
         if (err2) {
             inp.message.channel.send('An error occured!');
             console.log('err2: ' + err2);
@@ -76,7 +116,8 @@ inp.args[2] = inp.args[2].toLowerCase();
         }
         inp.message.channel.send('Successfully deleted the command ' + inp.dbConnection.escape(inp.args[1]) + '!\n\nIf this was a mistake, please ask my developer to recover the command, and give him the reason why! Please copy and paste this to him:\n```\nID: ' + rows1[0].id + '\n```');
       });
-    })
+    });
+  });
     break;
     case 'permanent_delete':
     if (!inp.args[1]) {
@@ -196,15 +237,18 @@ inp.args[2] = inp.args[2].toLowerCase();
   });
     break;
     case 'list':
-    inp.dbConnection.query(`SELECT * FROM customcmds WHERE guild='${inp.message.guild.id}' AND deleted=0`, (err1, rows1) => {
+    inp.dbConnection.query(`SELECT * FROM customcmds WHERE guild='${inp.message.guild.id}'`, (err1, rows1) => {
       let embed = new Discord.RichEmbed();
       embed.setColor('#772244');
       embed.setTitle('All avalible custom commands for this guild');
       embed.addBlankField();
       rows1.forEach(row => {
           let cmdDescription = (row.description) ? row.description : 'No description provided';
+          let cmdPermissions = (row.permissions) ? row.permissions.split(';').join(', ') : 'No permission provided';
+          let cmdExec = (row.exec) ? row.exec.split(';').join(', ') : 'No executable provided';
+          let cmdOnlyExec = (row.onlyExec === 1) ? 'true' : 'false';
           let authorOfCommand = (inp.message.guild.members.get(row.creator)) ? inp.message.guild.members.get(row.creator).user.username : 'I did not see the author of this command in this guild, hes id is ' + row.creator;
-          embed.addField('__**' + row.name + '**__', '**Type: **' + row.type + '\n**Permissions: **' + row.permissions.split(';').join(', ') + '\n**Syntax:** ' + row.syntax + '\n**Creator:** ' + authorOfCommand + '\n**Description:** ' + cmdDescription + '\n**Value:** ' + row.value + '\n');
+          embed.addField('__**' + row.name + '**__', '**Id: **' + row.id + '\n**Type: **' + row.type + '\n**Permissions: **' + cmdPermissions + '\n**Exec: **' + cmdExec + '\n**Only exec: **' + cmdOnlyExec + '\n**Syntax:** ' + row.syntax + '\n**Creator:** ' + authorOfCommand + '\n**Description:** ' + cmdDescription + '\n**Value:** ' + row.value + '\n');
       });
 
       inp.message.channel.send({embed});
@@ -228,7 +272,7 @@ inp.args[2] = inp.args[2].toLowerCase();
       inp.message.channel.send('You can only have a value between 0 and 15 as the syntax!');
       return;
     }
-    inp.dbConnection.query(`SELECT * FROM customcmds WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild="${inp.message.guild.id}" AND deleted=0`, (err1, rows1) => {
+    inp.dbConnection.query(`SELECT * FROM customcmds WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild="${inp.message.guild.id}"`, (err1, rows1) => {
       if (err1) {
         inp.message.channel.send('An error occured!');
         console.log('err1: ' + err1);
@@ -238,7 +282,7 @@ inp.args[2] = inp.args[2].toLowerCase();
         inp.message.channel.send('The command does not exist!');
         return;
       }
-    inp.dbConnection.query(`UPDATE customcmds SET syntax=${inp.dbConnection.escape(inp.args[2])} WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild=${inp.dbConnection.escape(inp.message.guild.id)} AND deleted=0`, (err2) => {
+    inp.dbConnection.query(`UPDATE customcmds SET syntax=${inp.dbConnection.escape(inp.args[2])} WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild=${inp.dbConnection.escape(inp.message.guild.id)}`, (err2) => {
       if (err2) {
         inp.message.channel.send('An error occured!');
         console.log('err2: ' + err2);
@@ -387,6 +431,133 @@ inp.dbConnection.query(`UPDATE customcmds SET type=${inp.dbConnection.escape(inp
 });
 });
 break;
+case 'recover':
+if (!inp.args[1]) {
+  inp.message.channel.send('Please provide a command ID for the command you\'re about to recover!');
+  return;
+}
+if (!inp.args[2]) {
+  inp.message.channel.send('Please provide a reason why you want to recover this command!');
+  return;
+}
+inp.dbConnection.query(`SELECT * FROM customcmds WHERE id=${inp.dbConnection.escape(inp.args[1])} AND guild="${inp.message.guild.id}"`, (err1, rows1) => {
+  if (err1) {
+      inp.message.channel.send('An error occured!');
+      console.log('err1: ' + err1);
+    return;
+  }
+
+  if (!rows1[0]) {
+    inp.message.channel.send('I did not recover that command successfully! It did not exist!');
+    return;
+  }
+
+  if (!inp.message.member.permissions.has('ADMINISTRATOR') && !inp.message.author.id(rows1[0].creator)) {
+    inp.message.channel.send('Missing permission to delete this command permanently! You need to either have administrator privileges or be the one who created the command!');
+    return;
+  }
+
+  inp.dbConnection.query(`SELECT * FROM customdelete WHERE cmdId=?`, rows1[0].id, (err3, rows3) => {
+    if (rows3[0]) {
+      let newestAction;
+      rows3.forEach((item3, i3) => {
+        if (!i3 > 0) {
+          newestAction = item3;
+          return; //Skip this index;
+        }
+        if (item3.timestamp > newestAction.timestamp) newestAction = item3;
+      });
+      if (newestAction.action === 'delete') return (inp.message.channel.send('This command is not deleted!'))
+    }
+    //Oh, it isnt deleted
+    let oldName = inp.args[1];
+    let newName;
+    let count = 0;
+    rows2.forEach((item2, i2) => {
+      if (item2.value = newName) {
+        if (count > 0) {
+          newName = oldName + '(' + count + ')';
+          return;
+        }
+        newName = oldName;
+        count++
+      }
+    })
+  inp.dbConnection.query(`INSERT INTO customdelete (cmdId, reason, deletedBy, channel, action, timeStamp) VALUES("${rows1[0].id}", ${inp.dbConnection.escape(inp.args[2])}, "${inp.message.author.id}", "${inp.message.channel.id}", "recover", "${Math.round(+new Date()/1000).toString()}")`, (err2, rows2) => {
+    if (err2) {
+        inp.message.channel.send('An error occured!');
+        console.log('err2: ' + err2);
+      return;
+    }
+    inp.dbConnection.query(`UPDATE customcmds SET name=${inp.dbConnection.escape(newName)} WHERE name=${inp.dbConnection.escape(oldName)} AND guild=${inp.dbConnection.escape(inp.message.guild.id)}`, (err3) => {
+      if (err3) {
+          inp.message.channel.send('An error occured!');
+          console.log('err3: ' + err3);
+        return;
+      }
+
+
+    inp.message.channel.send('Successfully recovered the command ' + inp.dbConnection.escape(oldName) + ' as ' + newName + '!');
+  });
+});
+});
+});
+break;
+case 'setexec':
+if (!inp.args[1]) {
+  inp.message.channel.send('Please provide a command!');
+  return;
+}
+
+inp.dbConnection.query(`SELECT * FROM customcmds WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild="${inp.message.guild.id}"`, (err1, rows1) => {
+  if (err1) {
+    inp.message.channel.send('An error occured!');
+    console.log('err1: ' + err1);
+    return;
+  }
+  if (!rows1[0]) {
+    inp.message.channel.send('The command does not exist!');
+    return;
+  }
+inp.dbConnection.query(`UPDATE customcmds SET exec=${inp.dbConnection.escape(inp.args[2])} WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild=${inp.dbConnection.escape(inp.message.guild.id)}`, (err2) => {
+  if (err2) {
+    inp.message.channel.send('An error occured!');
+    console.log('err2: ' + err2);
+    return;
+  }
+  inp.message.channel.send('Successfully updated/set the exec for the command ' + inp.dbConnection.escape(inp.args[1]));
+});
+});
+break;
+case 'setonlyexec':
+if (!inp.args[1]) {
+  inp.message.channel.send('Please provide a command!');
+  return;
+}
+
+inp.dbConnection.query(`SELECT * FROM customcmds WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild="${inp.message.guild.id}"`, (err1, rows1) => {
+  if (err1) {
+    inp.message.channel.send('An error occured!');
+    console.log('err1: ' + err1);
+    return;
+  }
+  if (!rows1[0]) {
+    inp.message.channel.send('The command does not exist!');
+    return;
+  }
+  let cmdValue;
+  if (inp.args[2] && inp.args[2] != 'false' && inp.args[2] != 0) cmdValue = 1;
+  else cmdValue = 0;
+  inp.dbConnection.query(`UPDATE customcmds SET onlyExec=${inp.dbConnection.escape(cmdValue)} WHERE name=${inp.dbConnection.escape(inp.args[1])} AND guild=${inp.dbConnection.escape(inp.message.guild.id)}`, (err2) => {
+  if (err2) {
+    inp.message.channel.send('An error occured!');
+    console.log('err2: ' + err2);
+    return;
+  }
+  inp.message.channel.send('Successfully updated/set the only exec for the command ' + inp.dbConnection.escape(inp.args[1]) + ' to ' + cmdValue + '!');
+});
+});
+break;
   }
 }
 exports.data = {
@@ -394,7 +565,7 @@ exports.data = {
     channel: [],
     guild: ['MANAGE_GUILD']
   },
-  denyBots: true,
+  denyBots: false,
   onlyDev: false,
   disabled: {
     isDisabled: false,

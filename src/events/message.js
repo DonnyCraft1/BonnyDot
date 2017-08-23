@@ -9,36 +9,18 @@ module.exports = (client, dbConnection, message) => {
 	dbConnection.query('SELECT * FROM guilds WHERE id = ?', message.guild.id, (err2, rows2) => {
 		if (err2) console.log(err2);
 		if (rows2[0]) {
-			lang = rows[0].language;
-			prefix = rows[0].prefix;
+			lang = rows2[0].language;
+			prefix = rows2[0].prefix;
 		} else {
 			lang = 'en';
 			prefix = config.prefix;
 		}
 
-		if (message.content.startsWith(config.prefix + 'prefix')) {
-			prefix = config.prefix;
-		} else {
-		if (!message.content.startsWith(prefix)) {
-		return;
-	}
-}
-	console.log('Prefix: \'' + prefix + '\'');
-
-
 		const args = message.content.slice(prefix.length).split(/\s+/g).slice(1);
 		const result = args.join(' ');
 		const command = message.content.substring(prefix.length, message.content.length - result.length).replace(/\s+/g, '');
-		console.log('cmd: \'' + command + '\'');
-		console.log('result: ' + result);
-		dbConnection.query(`SELECT * FROM customcmds WHERE name=? AND guild="${message.guild.id}" AND deleted=0`, command, (err1, rows1) => {
 
-			if (rows1[1])
 
-		if (!command) return;
-		if(!message.member) return(message.channel.send('Ew, please use my commmands in a guild!'));
-
-		console.log(chalk.bgCyan.black('By ' + message.author.username) + '\n' + message.content + '\n\nGuild: ' + message.guild.name + '\nChannel: ' + message.channel.name);
 
 		let commandsList = fs.readdirSync('./commands/');
 		commandsList.forEach((file, index) => {
@@ -50,15 +32,36 @@ module.exports = (client, dbConnection, message) => {
 			return value.replace(/\.js$/, '');
 		};
 
-		if (rows2[0])
-
 		commandsList.forEach((cmdName, index) => {
 			allCommands.set(removeJS(cmdName), removeJS(cmdName));
 			let aliases = require(`../commands/${cmdName}`).data.aliases;
 			aliases.forEach((alias, index2) => allCommands.set(removeJS(alias), removeJS(cmdName)));
 		});
-			if (!allCommands.has(command)) return(message.channel.send('Sorry, that command does not exist!'));
-			//THE COMMAND EXIST!
+
+		if (message.content.startsWith(config.prefix + 'prefix')) {
+			prefix = config.prefix;
+		} else {
+		if (!message.content.startsWith(prefix)) {
+		return;
+	}
+}
+
+
+
+		dbConnection.query(`SELECT * FROM customcmds WHERE name=? AND guild="${message.guild.id}" AND deleted=0`, command, (err1, rows1) => {
+
+
+		if (!allCommands.has(command)) return(message.channel.send('Sorry, that command does not exist!'));
+				//THE COMMAND EXIST!
+
+
+		if (!command) return;
+		if(!message.member) return(message.channel.send('Ew, please use my commmands in a guild!'));
+
+		console.log(chalk.bgCyan.black('By ' + message.author.username) + '\n' + message.content + '\n\nGuild: ' + message.guild.name + '\nChannel: ' + message.channel.name);
+
+
+
 			let cmdFileName = allCommands.get(command);
 			let cmdFile = require(`../commands/${cmdFileName}`);
 
