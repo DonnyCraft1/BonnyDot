@@ -45,7 +45,7 @@ exports.run = (inp) => {
       return;
     }
     let randomTimesMoney = timesMoney[Math.floor(Math.random() * timesMoney.length)];
-    inp.message.channel.send('You bet ' + moneyToBet + ' and now you got ' + moneyToBet * randomTimesMoney + '!');
+    inp.message.channel.send('__**' + randomTimesMoney * 100 + '%**__\nYou bet `$' + moneyToBet + '` out of `$' + rows1[0].vault + '` and now you got `$' + moneyToBet * randomTimesMoney + '`! Your balance is now `$' + (rows1[0].vault -  moneyToBet + moneyToBet * randomTimesMoney) + '`!');
     let moneyAfterBet = rows1[0].vault;
     moneyAfterBet -= moneyToBet;
     moneyAfterBet += moneyToBet * randomTimesMoney;
