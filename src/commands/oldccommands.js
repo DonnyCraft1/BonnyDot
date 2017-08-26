@@ -13,7 +13,7 @@ inp.dbConnection.query(`SELECT * FROM customdelete WHERE cmdId=?`, 'ID OF COMMAN
     rows3.forEach((item3, i3) => {
       if (!i3 > 0) {
         newestAction = item3;
-        continue;
+        return;
       }
       if (item3.timestamp > newestAction.timestamp) newestAction = item3;
     });
@@ -70,7 +70,7 @@ inp.args[2] = inp.args[2].toLowerCase();
             rows3.forEach((item3, i3) => {
               if (!i3 > 0) {
                 newestAction = item3;
-                continue;
+                return;
               }
               if (item3.timestamp > newestAction.timestamp) newestAction = item3;
             });
@@ -88,7 +88,7 @@ inp.args[2] = inp.args[2].toLowerCase();
         inp.message.channel.send('Command created with the name ' + inp.dbConnection.escape(inp.args[1]) + '!');
       });
     });
-  )};
+  });
     break;
     case 'delete':
     if (!inp.args[1]) {
