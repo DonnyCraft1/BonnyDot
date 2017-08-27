@@ -7,7 +7,61 @@ module.exports = (client, dbConnection, message) => {
 	let lang;
 	let prefix;
 	dbConnection.query('SELECT * FROM guilds WHERE id = ?', message.guild.id, (err2, rows2) => {
-		if (err2) console.log(err2);
+		dbConnection.query('SELECT * FROM users WHERE id = ?', message.author.id, (err3, rows3) => {
+		if (err2) {
+			console.log(err2);
+			message.channel.send('An error occured!');
+			return;
+		}
+		if (err3) {
+			console.log(err3);
+			message.channel.send('An error occured!');
+			return;
+		}
+
+		if (!rows3[0]) {
+			dbConnection.query('INSERT INTO users (id, vault, points, level) VALUE (?, 0, 0, 0)', message.author.id, (err2) => {
+        if (err2) {
+          message.channel.send('An error occured!');
+          console.log('err2: ' + err2);
+          return;
+        }
+      });
+		} else if (rows3[0].points === undefined) {
+			dbConnection.query('UPDATE users SET points=0 WHERE id=?', message.author.id, (err3) => {
+        if (err3) {
+          message.channel.send('An error occured!');
+          console.log('err3: ' + err3);
+          return;
+        }
+      });
+		} else {
+			dbConnection.query('UPDATE users SET points=' + dbConnection.escape(rows3[0].points + 1) + ' WHERE id=?', message.author.id, (err4) => {
+				if (err4) {
+          message.channel.send('An error occured!');
+          console.log('err4: ' + err4);
+          return;
+        }
+				if (rows3[0].points + 1 > (rows3[0].level + 1) * 500) {
+					dbConnection.query('UPDATE users SET points=0, level=' + (rows3[0].level + 1) + ' WHERE id=?', message.author.id, (err5) => {
+						if (err5) {
+		          message.channel.send('An error occured!');
+		          console.log('err5: ' + err5);
+		          return;
+		        }
+						message.channel.send(message.author + ' has risen their level to lvl ' + (rows3[0].level + 1) + ' and earned `$' + 100 * (rows3[0].level + 1) + '`');
+						dbConnection.query('UPDATE users SET vault=' + (rows3[0].vault + (100 * (rows3[0].level + 1))) + ' WHERE id=?', message.author.id, (err6) => {
+							if (err6) {
+			          message.channel.send('An error occured!');
+			          console.log('err6: ' + err6);
+			          return;
+			        }
+						});
+					});
+				}
+			});
+		}
+
 		if (rows2[0]) {
 			lang = rows2[0].language;
 			prefix = rows2[0].prefix;
@@ -46,9 +100,6 @@ module.exports = (client, dbConnection, message) => {
 	}
 }
 
-
-
-		dbConnection.query(`SELECT * FROM customcmds WHERE name=? AND guild="${message.guild.id}" AND deleted=0`, command, (err1, rows1) => {
 
 
 		if (!allCommands.has(command)) return(message.channel.send('Sorry, that command does not exist!'));
